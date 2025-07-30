@@ -9,33 +9,50 @@ on:
 jobs:
   build-zip:
     runs-on: ubuntu-latest
+    env:
+      PLUGIN_DIR: mini-fair
+      ZIP_NAME: mini-fair.zip
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - uses: shivammathur/setup-php@v2
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
         with:
           php-version: '8.1'
           extensions: mbstring, json, xml
 
-      - uses: actions/cache@v4
+      - name: Cache Composer cache
+        uses: actions/cache@v4
         with:
           path: ~/.composer/cache
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
 
-      - run: composer install --no-dev --prefer-dist --optimize-autoloader
+      - name: Install Composer dependencies
+        run: composer install --no-dev --prefer-dist --optimize-autoloader
 
       - name: Create plugin ZIP
         run: |
-          ZIP_NAME=mini-fair.zip
-          zip -r $ZIP_NAME . \
+          # go into the plugin directory so its files end up at the ZIP root
+          cd $PLUGIN_DIR
+
+          # remove any old ZIP
+          rm -f "../$ZIP_NAME"
+
+          # zip everything here, excluding VCS/CI/tests
+          zip -r "../$ZIP_NAME" . \
             -x ".git*" \
             -x ".github/*" \
             -x "tests/*" \
             -x ".gitignore" \
             -x ".gitattributes"
 
-      - uses: actions/upload-artifact@v4
+          # back to repo root
+          cd -
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
         with:
           name: mini-fair-zip
-          path: mini-fair.zip
+          path: ${{ env.ZIP_NAME }}
