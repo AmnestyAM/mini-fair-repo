@@ -24,7 +24,16 @@ jobs:
         run: composer install --no-dev --prefer-dist --no-progress --no-interaction
 
       - name: Build plugin ZIP
-        run: bash build-zip.sh
+        run: |
+          mkdir -p build
+          zip -r build/mini-fair.zip \
+            plugin.php \
+            composer.json \
+            composer.lock \
+            inc \
+            vendor \
+            readme.txt \
+            -x "*.git*" "*.github*" "tests/*" "build/*"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
