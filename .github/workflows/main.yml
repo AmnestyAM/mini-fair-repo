@@ -1,0 +1,54 @@
+name: Build Mini FAIR Plugin ZIP
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-zip:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Check out your code
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2. Set up PHP >=7.4
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+          extensions: mbstring, json, xml
+
+      # 3. Cache/composer install (no-dev)
+      - name: Cache Composer packages
+        uses: actions/cache@v3
+        with:
+          path: vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+      - name: Install Composer dependencies
+        run: composer install --no-dev --prefer-dist --optimize-autoloader
+
+      # 4. Zip plugin directory
+      - name: Create plugin ZIP
+        run: |
+          PLUGIN_SLUG=mini-fair
+          ZIP_NAME=${PLUGIN_SLUG}.zip
+          # Ensure you’re zipping the plugin root, excluding dev/git files
+          zip -r $ZIP_NAME . \
+            -x "*.git*" \
+            -x ".github/*" \
+            -x "tests/*" \
+            -x ".gitignore" \
+            -x ".gitattributes"
+
+      # 5. Upload the ZIP as an artifact
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: mini-fair-plugin-zip
+          path: mini-fair.zip
