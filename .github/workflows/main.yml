@@ -22,14 +22,7 @@ jobs:
 
       - name: Create mini-fair.zip
         run: |
-          zip -r mini-fair.zip \
-            plugin.php \
-            composer.json \
-            composer.lock \
-            inc \
-            vendor \
-            readme.txt \
-            -x "*.git*" "*.github*" "tests/*" "build/*" "*.zip"
+           zip -r mini-fair.zip . -x "*.git*" "*.github*" "build/*" "node_modules/*" "tests/*"
 
       - name: Upload mini-fair.zip as artifact
         uses: actions/upload-artifact@v4
