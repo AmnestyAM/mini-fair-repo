@@ -29,7 +29,7 @@ jobs:
             inc \
             vendor \
             readme.txt \
-            -x "*.git*" "*.github*" "tests/*" "build/*"
+            -x "*.git*" "*.github*" "tests/*" "build/*" "*.zip"
 
       - name: Upload mini-fair.zip as artifact
         uses: actions/upload-artifact@v4
