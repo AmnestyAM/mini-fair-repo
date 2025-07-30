@@ -1,4 +1,4 @@
-name: Build Mini FAIR Plugin ZIP
+name: Build Mini FAIR Plugin ZIP
 
 on:
   push:
@@ -9,9 +9,6 @@ on:
 jobs:
   build-zip:
     runs-on: ubuntu-latest
-    env:
-      PLUGIN_DIR: mini-fair
-      ZIP_NAME: mini-fair.zip
 
     steps:
       - name: Checkout repository
@@ -34,25 +31,19 @@ jobs:
 
       - name: Create plugin ZIP
         run: |
-          # go into the plugin directory so its files end up at the ZIP root
-          cd $PLUGIN_DIR
-
-          # remove any old ZIP
-          rm -f "../$ZIP_NAME"
-
-          # zip everything here, excluding VCS/CI/tests
-          zip -r "../$ZIP_NAME" . \
-            -x ".git*" \
+          ZIP_NAME=mini-fair.zip
+          echo "Removing old $ZIP_NAME if present..."
+          rm -f "$ZIP_NAME"
+          echo "Zipping current directory into $ZIP_NAME..."
+          zip -r "$ZIP_NAME" . \
+            -x ".git/*" \
             -x ".github/*" \
             -x "tests/*" \
             -x ".gitignore" \
             -x ".gitattributes"
 
-          # back to repo root
-          cd -
-
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: mini-fair-zip
-          path: ${{ env.ZIP_NAME }}
+          path: mini-fair.zip
