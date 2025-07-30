@@ -22,3 +22,14 @@ require __DIR__ . '/inc/plc/util.php';
 require __DIR__ . '/vendor/autoload.php';
 
 bootstrap();
+
+add_filter( 'upgrader_clear_destination', function( $clear_destination, $hook_extra ) {
+    // $hook_extra['plugin'] is set when installing/updating a plugin via the UI/upgrader
+    if ( ! empty( $hook_extra['plugin'] ) 
+      && strpos( $hook_extra['plugin'], 'mini-fair/' ) === 0 
+    ) {
+        // true = delete the existing directory before unpacking
+        return true;
+    }
+    return $clear_destination;
+}, 10, 2 );
