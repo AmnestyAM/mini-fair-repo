@@ -1,32 +1,28 @@
-name: Build Plugin ZIP
+name: Build mini-fair.zip Artifact
 
 on:
   push:
-    branches:
-      - main
-  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.1'
-          tools: composer
 
       - name: Install dependencies
-        run: composer install --no-dev --prefer-dist --no-progress --no-interaction
+        run: composer install --no-dev --prefer-dist --no-progress
 
-      - name: Build plugin ZIP
+      - name: Create mini-fair.zip
         run: |
-          mkdir -p build
-          zip -r build/mini-fair.zip \
+          zip -r mini-fair.zip \
             plugin.php \
             composer.json \
             composer.lock \
@@ -35,8 +31,8 @@ jobs:
             readme.txt \
             -x "*.git*" "*.github*" "tests/*" "build/*"
 
-      - name: Upload artifact
+      - name: Upload mini-fair.zip as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: mini-fair-plugin-zip
-          path: build/mini-fair.zip
+          name: mini-fair
+          path: mini-fair.zip
