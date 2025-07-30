@@ -12,21 +12,22 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4   
+        uses: actions/checkout@v4
 
       - name: Set up PHP
-        uses: shivammathur/setup-php@v2  
+        uses: shivammathur/setup-php@v2
         with:
-          php-version: '7.4'
+          php-version: '8.1'                 # ← now satisfies CBOR‑PHP ≥3.1
           extensions: mbstring, json, xml
 
       - name: Cache Composer packages
-        uses: actions/cache@v4       
+        uses: actions/cache@v4
         with:
           path: vendor
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: |
             ${{ runner.os }}-composer-
+
       - name: Install Composer dependencies
         run: composer install --no-dev --prefer-dist --optimize-autoloader
 
@@ -42,7 +43,7 @@ jobs:
             -x ".gitattributes"
 
       - name: Upload build artifact
-        uses: actions/upload-artifact@v4  
+        uses: actions/upload-artifact@v4
         with:
           name: mini-fair-plugin-zip
           path: mini-fair.zip
