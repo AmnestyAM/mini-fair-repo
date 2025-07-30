@@ -9,46 +9,33 @@ on:
 jobs:
   build-zip:
     runs-on: ubuntu-latest
-    env:
-      PLUGIN_DIR: mini-fair
-      ZIP_NAME: mini-fair.zip
 
     steps:
-      # 1. Check out your repo
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      # 2. Set up PHP 8.1
-      - name: Set up PHP
-        uses: shivammathur/setup-php@v2
+      - uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.1'   # satisfy CBOR‑PHP ≥3.1
+          php-version: '8.1'
           extensions: mbstring, json, xml
 
-      # 3. Cache Composer’s cache (faster, more reliable than caching vendor/)
-      - name: Cache Composer cache
-        uses: actions/cache@v4
+      - uses: actions/cache@v4
         with:
           path: ~/.composer/cache
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
 
-      # 4. Install production dependencies
-      - name: Install Composer dependencies
-        run: composer install --no-dev --prefer-dist --optimize-autoloader
+      - run: composer install --no-dev --prefer-dist --optimize-autoloader
 
-      # 5. Zip only the plugin directory, naming it mini-fair.zip
       - name: Create plugin ZIP
         run: |
-          zip -r $ZIP_NAME $PLUGIN_DIR \
-            -x "$PLUGIN_DIR/.git*" \
-            -x "$PLUGIN_DIR/.github/*" \
-            -x "$PLUGIN_DIR/tests/*" \
-            -x "$PLUGIN_DIR/.gitignore" \
-            -x "$PLUGIN_DIR/.gitattributes"
+          ZIP_NAME=mini-fair.zip
+          zip -r $ZIP_NAME . \
+            -x ".git*" \
+            -x ".github/*" \
+            -x "tests/*" \
+            -x ".gitignore" \
+            -x ".gitattributes"
 
-      # 6. Upload that exact zip as an artifact
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: mini-fair-zip
-          path: ${{ env.ZIP_NAME }}
+          path: mini-fair.zip
