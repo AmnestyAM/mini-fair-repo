@@ -1,49 +1,33 @@
-name: Build Mini FAIR Plugin ZIP
+name: Build Plugin ZIP
 
 on:
   push:
     branches:
       - main
-  workflow_dispatch:
+  pull_request:
 
 jobs:
-  build-zip:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.1'
-          extensions: mbstring, json, xml
+          tools: composer
 
-      - name: Cache Composer cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.composer/cache
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+      - name: Install dependencies
+        run: composer install --no-dev --prefer-dist --no-progress --no-interaction
 
-      - name: Install Composer dependencies
-        run: composer install --no-dev --prefer-dist --optimize-autoloader
+      - name: Build plugin ZIP
+        run: bash build-zip.sh
 
-      - name: Create plugin ZIP
-        run: |
-          ZIP_NAME=mini-fair.zip
-          echo "Removing old $ZIP_NAME if present..."
-          rm -f "$ZIP_NAME"
-          echo "Zipping current directory into $ZIP_NAME..."
-          zip -r "$ZIP_NAME" . \
-            -x ".git/*" \
-            -x ".github/*" \
-            -x "tests/*" \
-            -x ".gitignore" \
-            -x ".gitattributes"
-
-      - name: Upload build artifact
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: mini-fair-zip
-          path: mini-fair.zip
+          name: mini-fair-plugin-zip
+          path: build/mini-fair.zip
