@@ -1,0 +1,20 @@
+{
+  "landingPage": "/wp-admin/admin.php?page=minifair",
+  "login": true,
+  "phpExtensionBundles": [
+        "kitchen-sink"
+    ],
+  "steps": [
+    {
+      "step": "installPlugin",
+      "pluginData": {
+        "resource": "url",
+        "url": "https://amnestyam.github.io/mini-fair-repo/mini-far.zip"
+      }
+    },
+    {
+      "step": "rm",
+      "path": "/wordpress/wp-content/plugins/hello.php"
+    }
+  ]
+}
