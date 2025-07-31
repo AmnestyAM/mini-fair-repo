@@ -13,6 +13,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout this workflow's repository (to commit back the ZIP)
+      - name: Checkout this repo
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 1
+
+      # Checkout the external mini-fair-repo into a subfolder
       - name: Checkout mini-fair-repo
         uses: actions/checkout@v4
         with:
@@ -20,23 +28,26 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           path: mini-fair-repo
 
+      # Setup PHP for Composer
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.1'
           tools: composer
 
+      # Install dependencies inside the external repo
       - name: Install dependencies
         working-directory: mini-fair-repo
         run: composer install --no-dev --prefer-dist --no-progress --no-interaction
 
+      # Create the ZIP in the root workspace
       - name: Create ZIP file
         working-directory: mini-fair-repo
         run: |
           ZIP_NAME=mini-fair.zip
           echo "Removing old $ZIP_NAME if present..."
           rm -f "../$ZIP_NAME"
-          echo "Zipping repository into $ZIP_NAME..."
+          echo "Zipping mini-fair-repo into ../$ZIP_NAME..."
           zip -r "../$ZIP_NAME" . \
             -x ".git/*" \
             -x ".github/*" \
@@ -44,6 +55,7 @@ jobs:
             -x "node_modules/*" \
             -x "tests/*"
 
+      # Commit the newly created ZIP back to this repo
       - name: Commit ZIP file
         run: |
           git config user.name "github-actions[bot]"
