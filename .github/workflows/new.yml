@@ -30,13 +30,21 @@ jobs:
 
       - name: Create ZIP file
         run: |
-          zip -r mini-fair.zip . \
-            -x ".git/*" ".github/*" "build/*" "node_modules/*" "tests/*"
+          ZIP_NAME=mini-fair.zip
+          echo "Removing old $ZIP_NAME if present..."
+          rm -f "$ZIP_NAME"
+          echo "Zipping repository into $ZIP_NAME..."
+          zip -r "$ZIP_NAME" . \
+            -x ".git/*" \
+            -x ".github/*" \
+            -x "build/*" \
+            -x "node_modules/*" \
+            -x "tests/*"
 
       - name: Commit ZIP file
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add pdf2p2.zip
-          git commit -m "Update pdf2p2.zip on push to main" || echo "No changes to commit"
+          git add mini-fair.zip
+          git commit -m "Update mini-fair.zip on push to main" || echo "No changes to commit"
           git push
