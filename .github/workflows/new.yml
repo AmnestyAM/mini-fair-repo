@@ -27,15 +27,17 @@ jobs:
           tools: composer
 
       - name: Install dependencies
+        working-directory: mini-fair-repo
         run: composer install --no-dev --prefer-dist --no-progress --no-interaction
 
       - name: Create ZIP file
+        working-directory: mini-fair-repo
         run: |
           ZIP_NAME=mini-fair.zip
           echo "Removing old $ZIP_NAME if present..."
-          rm -f "$ZIP_NAME"
+          rm -f "../$ZIP_NAME"
           echo "Zipping repository into $ZIP_NAME..."
-          zip -r "$ZIP_NAME" . \
+          zip -r "../$ZIP_NAME" . \
             -x ".git/*" \
             -x ".github/*" \
             -x "build/*" \
