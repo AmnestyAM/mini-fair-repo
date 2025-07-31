@@ -9,7 +9,7 @@
       "step": "installPlugin",
       "pluginData": {
         "resource": "url",
-        "url": "https://amnestyam.github.io/mini-fair-repo/mini-fair.zip"
+        "url": "https://raw.githubusercontent.com/fairpm/mini-fair-repo/main/mini-fair.zip"
       }
     },
     {
